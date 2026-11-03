@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<!--
+  Bookworm (4XS Press KDP platform) — GitHub Pages landing page.
+  Design: 4XS Press look (warm paper, ink, vermilion), Andika, light theme by default + toggle.
+  Screenshots live in docs/img/ (SEO-named); any missing image hides automatically.
+  Publish: repo Settings → Pages → Source: "Deploy from a branch" → /docs.
+-->
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bookworm — 4XS Press KDP publishing platform</title>
+<meta name="description" content="Bookworm turns a book idea into a print-ready Amazon KDP paperback: interior and cover PDFs, KDP metadata, scan-and-hear audio QR codes on every word, promo banners and a publisher website." />
+<meta property="og:title" content="Bookworm — from book idea to KDP paperback in hours" />
+<meta property="og:description" content="A one-person publishing platform by 4XS Press: idea checks, word tables, line art traced from real references, KDP-compliant PDFs and audio on every word." />
+<meta property="og:image" content="img/bookworm-workflow-diagram.png" />
+<meta property="og:type" content="website" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#faf6ee; --panel:#ffffff; --ink:#1d1d1b; --text:#2a2926; --muted:#6b6a64; --line:#e3dccd; --accent:#b4321e; --accent-ink:#fff; --soft:#f3ece0; --blue:#2c5a8c; }
+  [data-theme="dark"] { --bg:#15150f; --panel:#1f1f18; --ink:#f3efe4; --text:#e6e2d6; --muted:#a19d91; --line:#36342b; --accent:#e0553c; --accent-ink:#fff; --soft:#25241c; --blue:#7fb0e6; }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; background:var(--bg); color:var(--text); font:17px/1.6 Andika, system-ui, sans-serif; }
+  a { color:var(--accent); }
+  .wrap { max-width:1120px; margin:0 auto; padding:0 16px; }
+  header.top { position:sticky; top:0; z-index:5; background:color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter:blur(6px); border-bottom:1px solid var(--line); }
+  header.top .wrap { display:flex; align-items:center; gap:14px; height:58px; }
+  .mark { width:38px; height:38px; border:3px solid var(--ink); border-radius:50%; display:grid; place-items:center; font-weight:700; font-size:12px; color:var(--ink); flex:none; }
+  .brand { font-weight:700; color:var(--ink); }
+  nav { margin-left:auto; display:flex; gap:16px; flex-wrap:wrap; font-size:15px; }
+  nav a { color:var(--text); text-decoration:none; } nav a:hover { color:var(--accent); }
+  #theme { background:var(--panel); color:var(--ink); border:1px solid var(--line); border-radius:8px; padding:5px 10px; cursor:pointer; font:inherit; font-size:14px; }
+  .hero { padding:64px 0 36px; }
+  .hero h1 { font-size:clamp(34px, 6vw, 58px); line-height:1.08; margin:0 0 14px; color:var(--ink); }
+  .hero h1 span { color:var(--accent); }
+  .hero p.lead { font-size:clamp(18px, 2.2vw, 22px); max-width:780px; margin:0 0 24px; color:var(--text); }
+  .btns { display:flex; gap:10px; flex-wrap:wrap; }
+  .btn { display:inline-block; padding:11px 18px; border-radius:10px; font-weight:700; text-decoration:none; border:2px solid var(--accent); }
+  .btn.primary { background:var(--accent); color:var(--accent-ink); } .btn.ghost { color:var(--accent); background:transparent; }
+  .stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:12px; margin:34px 0 0; }
+  .stat { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .stat b { display:block; font-size:28px; color:var(--ink); line-height:1.1; } .stat span { color:var(--muted); font-size:14px; }
+  section { padding:44px 0; border-top:1px solid var(--line); }
+  h2 { font-size:clamp(26px, 3.6vw, 36px); margin:0 0 10px; color:var(--ink); }
+  .sub { color:var(--muted); max-width:760px; margin:0 0 24px; }
+  .steps { display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:12px; }
+  .step { background:var(--panel); border:1px solid var(--line); border-left:5px solid var(--accent); border-radius:12px; padding:14px 16px; }
+  .step b { color:var(--ink); display:block; margin-bottom:4px; } .step p { margin:0; font-size:15px; color:var(--muted); }
+  .feature { display:grid; grid-template-columns:1fr 1.15fr; gap:32px; align-items:center; }
+  .feature.flip { grid-template-columns:1.15fr 1fr; } .feature.flip .txt { order:2; }
+  .feature ul { padding-left:20px; margin:10px 0 0; } .feature li { margin:4px 0; }
+  figure { margin:0; } figure img { width:100%; height:auto; display:block; border-radius:12px; border:1px solid var(--line); background:#fff; box-shadow:0 6px 24px rgba(0,0,0,.08); }
+  figcaption { font-size:14px; color:var(--muted); margin-top:8px; }
+  .pair { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .gallery { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:18px; }
+  table { width:100%; border-collapse:collapse; background:var(--panel); border:1px solid var(--line); border-radius:12px; overflow:hidden; font-size:15px; }
+  th, td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top; } th { background:var(--soft); color:var(--ink); }
+  .tablewrap { overflow-x:auto; }
+  .tag { display:inline-block; font-size:12px; font-weight:700; padding:2px 9px; border-radius:999px; background:color-mix(in srgb, var(--accent) 14%, transparent); color:var(--accent); margin-bottom:8px; }
+  footer { padding:32px 0 48px; color:var(--muted); font-size:14px; border-top:1px solid var(--line); }
+  @media (max-width:820px) { .feature, .feature.flip { grid-template-columns:1fr; } .feature.flip .txt { order:0; } .pair { grid-template-columns:1fr; } nav { display:none; } }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="mark">4XS</div><div class="brand">Bookworm · 4XS Press</div>
+  <nav><a href="#how">How it works</a><a href="#audio">Audio</a><a href="#pictures">Pictures</a><a href="#pages">Pages</a><a href="#publish">Publishing</a><a href="workflow.html">Workflow diagram</a></nav>
+  <button id="theme" type="button" aria-label="Toggle dark mode">☾</button>
+</div></header>
+
+<main class="wrap">
+  <div class="hero">
+    <span class="tag">Private platform · Bookworm 2.16.6</span>
+    <h1>From book idea to <span>KDP paperback</span> in hours, not weeks.</h1>
+    <p class="lead">Bookworm is the one-person publishing platform behind 4XS Press. It checks a book idea against real Amazon signals, builds a KDP-compliant interior and cover, gives every word a printed QR code that plays its pronunciation, and publishes the book's page on 4xspress.com. The words and the final check stay human; everything else is automated.</p>
+    <div class="btns">
+      <a class="btn primary" href="workflow.html">Interactive workflow</a>
+      <a class="btn ghost" href="BOOKWORM_SPEC.md">Full specification</a>
+      <a class="btn ghost" href="https://4xspress.com">4xspress.com</a>
+    </div>
+    <div class="stats">
+      <div class="stat"><b>16</b><span>titles built</span></div>
+      <div class="stat"><b>15</b><span>on Amazon KDP: 5 live, 10 in review</span></div>
+      <div class="stat"><b>10</b><span>combinable page blocks</span></div>
+      <div class="stat"><b>Every word</b><span>scan &amp; hear audio</span></div>
+      <div class="stat"><b>~$0</b><span>free tiers first, paid AI per click</span></div>
+    </div>
+  </div>
+
+  <section id="how">
+    <h2>How a book is made</h2>
+    <p class="sub">Five steps in one web app. Each step has an explicit approve point, so AI drafts and the author decides.</p>
+    <div class="steps">
+      <div class="step"><b>0 · Preparer</b><p>Amazon search suggestions and a results screenshot, then a free-AI scorecard: potential, niche, risks, titles, keywords, first 20 words.</p></div>
+      <div class="step"><b>1 · Book</b><p>Audience, language, host character, page blocks, AI-drafted KDP description with only true facts, keywords, categories, cover.</p></div>
+      <div class="step"><b>2 · Words</b><p>One editable table: word, say-it, translation, sentences, notes, clues. AI fills gaps; facts are web-checked; sources are never printed.</p></div>
+      <div class="step"><b>3 · Pictures</b><p>Black-and-white line art per word, consistent characters, pictures traced from real references and checked by a vision model.</p></div>
+      <div class="step"><b>4 · Build</b><p>interior.pdf, cover.pdf, KDP metadata and form-fill data, with KDP rules as hard build checks.</p></div>
+    </div>
+    <figure style="margin-top:26px"><a href="workflow.html"><img src="img/bookworm-workflow-diagram.png" alt="Bookworm workflow diagram: Preparer, book setup, word table, pictures, build, audio and QR, publish site, with AI services and data stores" loading="lazy"></a>
+      <figcaption>The whole pipeline. Open the <a href="workflow.html">interactive version</a> to follow each connection.</figcaption></figure>
+  </section>
+
+  <section id="audio">
+    <div class="feature">
+      <div class="txt">
+        <span class="tag">Signature feature</span>
+        <h2>Scan &amp; hear every word</h2>
+        <p>A printed book can't speak, so every word in a Bookworm book has a QR code. A phone camera opens the word's listen page and plays it in a slow, clear voice, with an example sentence.</p>
+        <ul>
+          <li>Codes point at permanent 4xspress.com addresses, not files: audio today, video tomorrow, no reprint.</li>
+          <li>A registry of every printed code; ids are never reused.</li>
+          <li>Czech and American English neural voices, recorded in the background with a live count.</li>
+        </ul>
+      </div>
+      <figure><img src="img/bookworm-audio-qr-codes-cross-promo.png" alt="Bookworm review step: listen pages and QR codes card, audio generation and cross-promo page picker" loading="lazy"><figcaption>Listen pages, QR codes and the cross-promo page, managed per book.</figcaption></figure>
+    </div>
+  </section>
+
+  <section id="pictures">
+    <div class="feature flip">
+      <div class="txt">
+        <span class="tag">New in 2.16</span>
+        <h2>Pictures traced from real references</h2>
+        <p>AI image tools invent details of real things. For coins, landmarks and objects, Bookworm finds a reference picture on Wikimedia Commons (licence and source kept), traces it as clean line art, and lets a free vision model compare the result with the reference before the author approves it.</p>
+        <ul>
+          <li>"Find missing references" fills a whole book from one search pattern.</li>
+          <li>Lettering is removed from coloring art; leftover text fails the check.</li>
+          <li>Image credits go on the copyright page.</li>
+        </ul>
+      </div>
+      <figure><img src="img/reference-picture-redraw-vision-check.png" alt="Official U.S. Mint state quarter images next to line art traced from them, with vision check scores" loading="lazy"><figcaption>U.S. Mint reference → traced line art → vision check score.</figcaption></figure>
+    </div>
+    <figure style="margin-top:28px"><img src="img/reveal-dot-to-dot-coloring-pages.png" alt="Reveal dot-to-dot pages: numbered dots with a small state map, and the full state quarter design to color overleaf" loading="lazy">
+      <figcaption>Reveal dot-to-dot: the dots hide the quarter's motif, the full design to color is overleaf as the answer.</figcaption></figure>
+  </section>
+
+  <section id="pages">
+    <h2>Pages that pass KDP the first time</h2>
+    <p class="sub">KDP rules are build checks, not rejection emails: margins, spine width, page range, pure black-and-white art, cover text 0.375 in inside the trim, keyword limits. Large print never shrinks below 16 pt; a page takes fewer words instead of overlapping, and a page left a third empty gets a word search.</p>
+    <div class="pair">
+      <figure><img src="img/large-print-dictionary-page.png" alt="Large-print Texas Czech dictionary page with say-it pronunciation, sentences and a QR code" loading="lazy"><figcaption>Dictionary page: Czech left, English right, QR code for the whole page.</figcaption></figure>
+      <figure><img src="img/dictionary-page-with-word-search.png" alt="Dictionary page whose empty space is filled with a word search of the chapter's words" loading="lazy"><figcaption>A short chapter end becomes a word search, answers at the back.</figcaption></figure>
+    </div>
+    <figure style="margin-top:18px"><img src="img/bookworm-build-page-previews.png" alt="Bookworm build preview showing every page of a book" loading="lazy"><figcaption>Every build previews every page; preview equals the final PDF.</figcaption></figure>
+  </section>
+
+  <section>
+    <h2>Inside the app</h2>
+    <div class="gallery">
+      <figure><img src="img/bookworm-books-dashboard.png" alt="Bookworm books dashboard with covers and a pipeline status per book" loading="lazy"><figcaption>Books: covers and the pipeline per book (words, pictures, audio, cover, build, KDP status).</figcaption></figure>
+      <figure><img src="img/bookworm-word-table-editor.png" alt="Bookworm word table editor with themes, words, definitions and picture descriptions" loading="lazy"><figcaption>Word table: edit, reorder, fill with AI.</figcaption></figure>
+      <figure><img src="img/bookworm-character-library-grandpa.png" alt="Bookworm character library: Grandpa turnaround and poses in line art and colour" loading="lazy"><figcaption>Character library: one image cut into figures, so the face stays the same.</figcaption></figure>
+    </div>
+  </section>
+
+  <section id="publish">
+    <div class="feature">
+      <div class="txt">
+        <h2>Publishing and promotion</h2>
+        <ul>
+          <li><b>Published register:</b> status, ASIN, price, royalty estimate, last build's PDFs.</li>
+          <li><b>KDP Fill:</b> a bookmarklet fills the KDP paperback form; uploads and Publish stay with the author.</li>
+          <li><b>4xspress.com:</b> series shelves, a page per book with Look inside and a listen demo, generated and deployed in one click.</li>
+          <li><b>Promo banners:</b> a social pack per book in the cover's own colours, with the real cover, a real page and the page count. Drawn in code, so every word is spelled right.</li>
+          <li><b>Cross-promo page</b> at the back of every book.</li>
+        </ul>
+      </div>
+      <div class="pair">
+        <figure><img src="img/texas-czech-words-book-cover.jpg" alt="Texas Czech Words: a large-print dictionary book cover with folk flowers, Texas star and kolache" loading="lazy"><figcaption>Cover</figcaption></figure>
+        <figure><img src="img/promo-banner-square.png" alt="Square promo banner for Texas Czech Words with cover, interior page and page-count badge" loading="lazy"><figcaption>Promo banner</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Engines and cost</h2>
+    <div class="tablewrap"><table>
+      <tr><th>Task</th><th>Engine</th><th>Cost</th></tr>
+      <tr><td>Line art, also traced from references</td><td>FLUX.2 Klein on Cloudflare Workers AI</td><td>Free tier</td></tr>
+      <tr><td>Premium art, character sheets, 4K covers</td><td>Gemini 3.1 Flash Image</td><td>Per image, shown in the app</td></tr>
+      <tr><td>Texts: descriptions, sentences, clues</td><td>Gemini 2.5 Flash</td><td>Cents per book</td></tr>
+      <tr><td>Idea scorecard, screenshot reading, picture check</td><td>NVIDIA Nemotron (free models)</td><td>Free</td></tr>
+      <tr><td>Word and sentence audio</td><td>Neural TTS</td><td>Free</td></tr>
+      <tr><td>PDFs, puzzles, dot-to-dot, banners, checks</td><td>Local Python code</td><td>Free</td></tr>
+      <tr><td>Login, site, backups</td><td>Cloudflare Tunnel, Access, Workers, R2</td><td>Free tiers</td></tr>
+    </table></div>
+    <p class="sub" style="margin-top:16px">Python 3.12 + FastAPI (~6,700 lines), one HTML/JS page (no framework), ReportLab PDFs, OpenCV checks. Runs on a Mac mini behind Cloudflare Tunnel with an email-code login; a Cloudflare Container version is prepared.</p>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  Bookworm is a private tool; this page describes it, the source code isn't public. · <a href="BOOKWORM_SPEC.md">Specification</a> · <a href="workflow.html">Workflow</a> · <a href="https://4xspress.com">4xspress.com</a><br>
+  © 2026 Pavel Kotyza · 4XS Press
+</div></footer>
+
+<script>
+  const btn = document.getElementById('theme');
+  const set = t => { document.documentElement.dataset.theme = t; btn.textContent = t === 'dark' ? '☀' : '☾'; try { localStorage.setItem('bw-theme', t); } catch (e) {} };
+  let saved = null; try { saved = localStorage.getItem('bw-theme'); } catch (e) {}
+  set(saved || 'light');
+  btn.addEventListener('click', () => set(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'));
+  document.querySelectorAll('figure img').forEach(i => i.addEventListener('error', () => i.closest('figure').style.display = 'none'));  // missing screenshot → hide it
+</script>
+</body>
+</html>

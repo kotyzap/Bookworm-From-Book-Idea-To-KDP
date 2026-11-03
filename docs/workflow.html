@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bookworm Workflow</title>
+<style>
+:root{
+  --page:#f6f4ef;--panel:#ffffff;--line:#e3dfd6;--text:#1b1b1b;--muted:#6b6b6b;--edge:#b9b4aa;--lane:#faf8f4;
+  --t-bg:#e8f0fe;--t-bd:#3B82F6;--p-bg:#e6f6ef;--p-bd:#10B981;--s-bg:#fdf3e1;--s-bd:#D98A06;
+  --o-bg:#fde8e8;--o-bd:#EF4444;--d-bg:#ecebfd;--d-bd:#6366F1;--q-bg:#f3e9fd;--q-bd:#A855F7;--nodetext:#1b1b1b;
+}
+[data-theme="dark"]{
+  --page:#0f0f0f;--panel:#161616;--line:#262626;--text:#ffffff;--muted:#888888;--edge:#444444;--lane:#131313;
+  --t-bg:#1e3a5f;--p-bg:#1a3d2e;--s-bg:#3d2e1a;--s-bd:#F59E0B;--o-bg:#3d1a1a;--d-bg:#1a1a2e;--q-bg:#2e1a3d;--nodetext:#ffffff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--text);font:14px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{max-width:1400px;margin:0 auto;padding:24px 16px 8px;display:flex;gap:16px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+h1{margin:0 0 4px;font-size:24px}
+header p{margin:0;color:var(--muted);max-width:820px}
+#theme{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit}
+.legend{max-width:1400px;margin:0 auto;padding:4px 16px 12px;display:flex;flex-wrap:wrap;gap:14px;color:var(--muted);font-size:13px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:14px;height:14px;border-radius:4px;border:2px solid;display:inline-block}
+.wrap{max-width:1400px;margin:0 auto 16px;padding:0 16px}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:auto;position:relative}
+#stage{position:relative;transform-origin:0 0}
+.lane{position:absolute;left:0;right:0;border-top:1px dashed var(--line);background:var(--lane)}
+.lane b{position:absolute;left:12px;top:8px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+svg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.node{position:absolute;width:190px;min-height:88px;padding:12px 14px;border-radius:12px;border:2px solid;color:var(--nodetext);cursor:pointer;
+  transition:transform .15s,box-shadow .15s,opacity .2s;user-select:none}
+.node .ic{font-size:18px;line-height:1}
+.node .lb{font-weight:700;margin:4px 0 2px}
+.node .sb{font-size:12px;opacity:.8}
+.node:hover{transform:scale(1.05);box-shadow:0 0 0 4px color-mix(in srgb,currentColor 0%,transparent),0 0 18px var(--glow)}
+.node.dim{opacity:.18}
+.node.on{box-shadow:0 0 0 3px var(--glow)}
+.trigger{background:var(--t-bg);border-color:var(--t-bd);--glow:var(--t-bd)}
+.process{background:var(--p-bg);border-color:var(--p-bd);--glow:var(--p-bd)}
+.tool{background:var(--s-bg);border-color:var(--s-bd);--glow:var(--s-bd)}
+.output{background:var(--o-bg);border-color:var(--o-bd);--glow:var(--o-bd)}
+.store{background:var(--d-bg);border-color:var(--d-bd);--glow:var(--d-bd)}
+.decision{background:var(--q-bg);border-color:var(--q-bd);--glow:var(--q-bd)}
+path.e{fill:none;stroke:var(--edge);stroke-width:1.6;transition:opacity .2s}
+path.e.hl{stroke-width:2.6;stroke-dasharray:7 5;animation:dash 1s linear infinite}
+path.e.dim,text.el.dim{opacity:.08}
+text.el{font-size:11px;fill:var(--muted);paint-order:stroke;stroke:var(--panel);stroke-width:4px;stroke-linejoin:round}
+text.el.hl{fill:var(--text);font-weight:600}
+@keyframes dash{to{stroke-dashoffset:-24}}
+#tip{position:fixed;z-index:9;max-width:300px;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:10px 12px;
+  font-size:13px;box-shadow:0 6px 24px rgba(0,0,0,.18);pointer-events:none;display:none}
+#tip b{display:block;margin-bottom:4px}
+.note{max-width:1400px;margin:0 auto;padding:0 16px 24px;color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Bookworm: 4XS Press KDP Platform</h1>
+    <p>From a book idea to a print-ready Amazon KDP paperback with "scan &amp; hear every word" audio and a publisher website. Hover a box for details, click it to follow its connections, and click empty space to reset.</p>
+  </div>
+  <button id="theme" type="button">Dark mode</button>
+</header>
+<div class="legend">
+  <span><i style="border-color:#3B82F6;background:var(--t-bg)"></i>Triggers</span>
+  <span><i style="border-color:#10B981;background:var(--p-bg)"></i>Processing</span>
+  <span><i style="border-color:var(--s-bd);background:var(--s-bg)"></i>Tools / services</span>
+  <span><i style="border-color:#EF4444;background:var(--o-bg)"></i>Outputs</span>
+  <span><i style="border-color:#6366F1;background:var(--d-bg)"></i>Data stores</span>
+  <span><i style="border-color:#A855F7;background:var(--q-bg)"></i>Decisions</span>
+</div>
+<div class="wrap"><div class="box" id="box"><div id="sizer"><div id="stage"></div></div></div></div>
+<p class="note"><a href="index.html">← Bookworm overview</a> · Bookworm 2.16.6 · November 2026 · Pavel Kotyza · 4XS Press. Source code is private.</p>
+<div id="tip"></div>
+<script>
+const W = 2220, H = 960;
+const lanes = [
+  ["Author", 0, 190], ["Bookworm pipeline", 190, 180], ["AI & voice services", 370, 190],
+  ["Data stores", 560, 180], ["Outputs & readers", 740, 220]
+];
+const N = [
+  // id, type, icon, label, subtitle, x, y, tooltip
+  ["idea","trigger","💡","New book idea","Theme, audience, language",40,70,"The author has an idea for a book: a theme, an audience (kids / seniors / adult) and a language (English or Czech–English)."],
+  ["prep","process","🧭","0 · Preparer","Is the idea worth a book?",530,70,"Idea check before anything is built. Real signals first: Amazon search-box suggestions and a screenshot of the Amazon results (read by a free vision model). Then a scorecard (go / maybe / no, potential, niche, risks, 3 titles, 7 keywords), the first 20 words and a saved discussion. Create book carries the words and keywords over."],
+  ["setup","process","📘","1 · Book setup","Blocks, host, KDP texts",270,230,"Step 1. Ordered content blocks, book host character, title/subtitle, AI-drafted Amazon description (only true book facts), 7 keywords, 3 KDP categories, price, cover settings."],
+  ["words","process","📝","2 · Word table","Words, say-it, sentences",530,230,"Step 2. One editable table: word, translation, pronunciation guide, example sentence, cultural note, crossword clue, picture description. AI drafts and fills cells; facts are fact-checked against web search. Source notes are never printed."],
+  ["pics","process","🎨","3 · Pictures","B&W line art per word",830,230,"Step 3. One line drawing per word in the audience's style. Character reference sheets keep the host consistent. For real subjects (coins, landmarks) the engine traces a reference picture from Wikimedia Commons or an upload instead of drawing from imagination, and a free vision model checks the result against it. Automatic grey/colour and single-object (dot-to-dot) checks."],
+  ["approve","decision","❓","Approve picture?","Author review",830,70,"The author approves each picture. Approval snaps it to pure black & white; a rejected picture is regenerated with the old one kept as .prev."],
+  ["build","process","⚙️","4 · Build","PDFs, puzzles, cover",1130,230,"Step 4. Deterministic build: interior.pdf (pages, word searches, crosswords, dot-to-dot, solutions, cross-promo page), cover.pdf (wrap with spine, safe zone, mirrored edges, WITH AUDIO seal), kdp_metadata.txt, kdp_fill.json. Dictionary pages take fewer words instead of overlapping, a page left a third empty gets a small word search, and reveal pages hide a picture in dots with the answer overleaf."],
+  ["checks","decision","🛡️","KDP checks pass?","Hard fails vs warnings",1130,70,"Hard checks block upload: page range, missing art, puzzle verification, cover text ≥ 0.375 in from trim, keyword length, banned medical terms, large-print minimum. Soft warnings: grey art, keywords repeating title words, unverified facts."],
+  ["audio","process","🔊","Audio & QR","Word + sentence clips",1430,230,"Every word and example sentence gets a slow, clear TTS clip. QR codes print as permanent 4xspress.com addresses (/l/book/word), so audio can later be swapped for video without reprinting."],
+  ["sitebuild","process","🌐","Publish site","Static site generator",1730,230,"Regenerates 4xspress.com from the Published register: shelves by series, one page per book, Look inside, listen demo, listen pages and redirects for renamed codes. Deploys with one click."],
+  ["gemini","tool","✨","OpenRouter · Gemini","Texts, premium art, covers",430,410,"Gemini 2.5 Flash drafts texts (descriptions, sentences, clues). Gemini 3.1 Flash Image makes premium pictures, character sheets and 4K front covers (~$0.15 each). Pay per use."],
+  ["nemo","tool","🟩","NVIDIA Nemotron","Free models, text + vision",665,410,"Free NVIDIA Nemotron models (OpenRouter free tier, NVIDIA API fallback): Ultra for the idea scorecard and chat, Lightning for first words, Super VL to read Amazon screenshots and to check pictures against their reference. If one model is busy, the next takes over."],
+  ["wai","tool","☁️","Workers AI","Free FLUX art + web search",900,410,"Cloudflare Workers AI: FLUX.2 Klein line art on the free daily allowance (~100 pictures/day), text fallback, and web search via AI Gateway for grounded fact books."],
+  ["tts","tool","🎙️","Neural TTS voices","Czech + US English",1380,410,"Free neural voices: Czech male for Grandpa (slow), Czech female for female characters, American English male for English books."],
+  ["refs","tool","🖼️","Commons + map data","Reference pictures, US states",1140,410,"Wikimedia Commons search for reference pictures (licence, author and source kept; credits printed on the copyright page) and US Census state outlines drawn as small maps on reveal pages."],
+  ["bookjson","store","🗂️","book.json + art","One folder per book",270,590,"Per book: texts, words, blocks, cover settings, KDP metadata, audio settings, and the art folder with picture metadata (model, seed, prompt, approval)."],
+  ["chars","store","👴","Character library","Grandpa, Grandma, Robot…",640,590,"Shared across all books: turnaround, 4 poses, 6 expressions, line + colour, one image cut into figures so the face stays the same. Pairs are always drawn together."],
+  ["r2","store","💾","R2 backups","Every build, nightly",880,590,"Every build's PDFs are copied to Cloudflare R2 with a timestamp; a nightly job backs up the whole workspace."],
+  ["qrreg","store","🔗","QR registry","Printed URL → word",1130,590,"Every QR URL a build prints, with the word it stands for. The build warns if a printed URL would now mean a different word; IDs are never reused."],
+  ["register","store","📋","Published register","Status, ASIN, price",1730,590,"One row per book: draft / in review / live, ASIN, price, category, site order and On site toggle. Locks a book's QR name once it is uploaded to KDP. Makes the promo banners."],
+  ["kdp","output","📦","Amazon KDP paperback","KDP Fill + uploads",1130,770,"The KDP Fill bookmarklet fills the KDP form from kdp_fill.json (title, description, keywords, categories, print options). The author uploads interior.pdf + cover.pdf and presses Publish."],
+  ["site","output","🏠","4xspress.com","Book & listen pages",1730,770,"Publisher site: series shelves, a page per book with cover zoom, previews and Amazon link, plus listen pages that play each word and sentence."],
+  ["reader","trigger","📱","Reader scans QR","Phone camera on a page",1430,770,"A reader points a phone at the QR code printed on a book page and hears the word and sentence spoken."],
+  ["banners","output","📣","Promo banners","Social pack per book",1990,770,"One click in the Published register: banners in the colours of the book's own cover with the real cover, a real interior page and an 'N pages' badge. Poster, Instagram, square, story, Facebook, LinkedIn and YouTube sizes, drawn in code so every word is spelled right."]
+];
+const E = [
+  ["idea","prep","the idea"],
+  ["prep","nemo","scorecard, words, chat"],
+  ["prep","setup","create book: words + keywords"],
+  ["setup","words","word columns per block"],
+  ["setup","bookjson","saves"],
+  ["words","gemini","AI drafts ↔ prompts"],
+  ["words","wai","fact-check queries",{t:.62}],
+  ["words","bookjson","word table"],
+  ["words","pics","picture descriptions"],
+  ["chars","pics","reference sheets"],
+  ["pics","wai","free line art"],
+  ["pics","gemini","premium art",{t:.72}],
+  ["refs","pics","reference pictures",{t:.4}],
+  ["pics","nemo","vision check",{t:.6}],
+  ["pics","approve","candidate",{t:.3}],
+  ["approve","pics","no: redo",{t:.3}],
+  ["approve","build","yes: B&W art"],
+  ["bookjson","build","texts, blocks, metadata",{t:.45}],
+  ["build","checks","check report"],
+  ["checks","setup","fail: fix & rebuild",{from:"top",to:"top",k:110,t:.42}],
+  ["checks","kdp","pass: PDFs + kdp_fill.json",{from:"right",to:"right",k:70,t:.83}],
+  ["build","r2","timestamped PDFs",{to:"right",k:90,t:.55}],
+  ["build","qrreg","printed QR URLs",{t:.5}],
+  ["bookjson","audio","words + sentences",{t:.78}],
+  ["audio","tts","text → mp3"],
+  ["audio","sitebuild","clips + listen data"],
+  ["qrreg","sitebuild","URLs + redirects",{from:"right",to:"bottom",k:200,t:.45}],
+  ["kdp","register","ASIN, status"],
+  ["register","sitebuild","books on site, order"],
+  ["sitebuild","site","deploy"],
+  ["register","banners","banner pack"],
+  ["reader","site","/l/book/word"]
+];
+
+const stage = document.getElementById("stage"), box = document.getElementById("box"), tip = document.getElementById("tip");
+stage.style.width = W + "px"; stage.style.height = H + "px";
+lanes.forEach(([t, y, h]) => { const d = document.createElement("div"); d.className = "lane"; d.style.top = y + "px"; d.style.height = h + "px"; d.innerHTML = `<b>${t}</b>`; stage.appendChild(d); });
+const svgNS = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(svgNS, "svg"); svg.setAttribute("width", W); svg.setAttribute("height", H); stage.appendChild(svg);
+const defs = document.createElementNS(svgNS, "defs"); svg.appendChild(defs);
+const color = {}; const el = {};
+N.forEach(([id, type, ic, lb, sb, x, y, tt]) => {
+  const d = document.createElement("div"); d.className = "node " + type; d.style.left = x + "px"; d.style.top = y + "px"; d.dataset.id = id;
+  d.innerHTML = `<div class="ic">${ic}</div><div class="lb">${lb}</div><div class="sb">${sb}</div>`;
+  d.addEventListener("mouseenter", () => { tip.innerHTML = `<b>${lb}</b>${tt}`; tip.style.display = "block"; });
+  d.addEventListener("mousemove", e => { const tx = Math.min(e.clientX + 14, innerWidth - 320); tip.style.left = tx + "px"; tip.style.top = (e.clientY + 14) + "px"; });
+  d.addEventListener("mouseleave", () => tip.style.display = "none");
+  d.addEventListener("click", ev => { ev.stopPropagation(); select(id); });
+  stage.appendChild(d); el[id] = d;
+});
+function border(id) { return getComputedStyle(el[id]).borderTopColor; }
+function marker(id, c) {
+  let m = document.getElementById("m-" + id); if (m) { m.firstChild.setAttribute("fill", c); return; }
+  m = document.createElementNS(svgNS, "marker"); m.id = "m-" + id; m.setAttribute("viewBox", "0 0 10 10"); m.setAttribute("refX", 9); m.setAttribute("refY", 5);
+  m.setAttribute("markerWidth", 7); m.setAttribute("markerHeight", 7); m.setAttribute("orient", "auto-start-reverse");
+  const p = document.createElementNS(svgNS, "path"); p.setAttribute("d", "M0,0 L10,5 L0,10 z"); p.setAttribute("fill", c); m.appendChild(p); defs.appendChild(m);
+}
+const paths = [];
+function anchor(r, other) {  // pick side facing the other node
+  const cx = r.x + r.w / 2, cy = r.y + r.h / 2, ox = other.x + other.w / 2, oy = other.y + other.h / 2;
+  const dx = ox - cx, dy = oy - cy;
+  if (Math.abs(dy) > Math.abs(dx) * 0.6) return dy > 0 ? [cx, r.y + r.h, 0, 1] : [cx, r.y, 0, -1];
+  return dx > 0 ? [r.x + r.w, cy, 1, 0] : [r.x, cy, -1, 0];
+}
+function side(r, s) { return { top: [r.x + r.w / 2, r.y, 0, -1], bottom: [r.x + r.w / 2, r.y + r.h, 0, 1], left: [r.x, r.y + r.h / 2, -1, 0], right: [r.x + r.w, r.y + r.h / 2, 1, 0] }[s]; }
+function rect(id) { const d = el[id]; return { x: d.offsetLeft, y: d.offsetTop, w: d.offsetWidth, h: d.offsetHeight }; }
+function draw() {
+  paths.forEach(p => { p.path.remove(); p.text.remove(); }); paths.length = 0;
+  const pair = {};
+  E.forEach(([a, b, label, o = {}], i) => {
+    const ra = rect(a), rb = rect(b);
+    let [x1, y1, nx1, ny1] = o.from ? side(ra, o.from) : anchor(ra, rb), [x2, y2, nx2, ny2] = o.to ? side(rb, o.to) : anchor(rb, ra);
+    const key = [a, b].sort().join("|"); const off = pair[key] ? 18 : 0; pair[key] = 1;  // separate two-way edges
+    x1 += ny1 ? off : 0; x2 += ny2 ? off : 0; y1 += nx1 ? off : 0; y2 += nx2 ? off : 0;
+    const k = o.k || Math.max(40, Math.hypot(x2 - x1, y2 - y1) * 0.35);
+    const c1x = x1 + nx1 * k, c1y = y1 + ny1 * k, c2x = x2 + nx2 * k, c2y = y2 + ny2 * k;
+    const p = document.createElementNS(svgNS, "path");
+    p.setAttribute("d", `M${x1},${y1} C${c1x},${c1y} ${c2x},${c2y} ${x2},${y2}`); p.setAttribute("class", "e");
+    const c = border(a); marker(a, c); p.setAttribute("marker-end", `url(#m-${a})`); p.style.stroke = "";
+    svg.appendChild(p);
+    const t = document.createElementNS(svgNS, "text"); t.setAttribute("class", "el"); t.textContent = label;
+    const T = o.t ?? .5, u = 1 - T, B = [u*u*u, 3*u*u*T, 3*u*T*T, T*T*T];
+    const mx = B[0]*x1 + B[1]*c1x + B[2]*c2x + B[3]*x2, my = B[0]*y1 + B[1]*c1y + B[2]*c2y + B[3]*y2;
+    t.setAttribute("x", mx); t.setAttribute("y", my - 4); t.setAttribute("text-anchor", "middle"); svg.appendChild(t);
+    paths.push({ a, b, path: p, text: t, color: c });
+  });
+  if (current) select(current, true);
+}
+let current = null;
+function select(id, keep) {
+  if (!keep && current === id) return reset();
+  current = id; const linked = new Set([id]);
+  paths.forEach(p => { const on = p.a === id || p.b === id; if (on) { linked.add(p.a); linked.add(p.b); }
+    p.path.classList.toggle("hl", on); p.path.classList.toggle("dim", !on); p.text.classList.toggle("hl", on); p.text.classList.toggle("dim", !on);
+    p.path.style.stroke = on ? p.color : ""; });
+  Object.entries(el).forEach(([k, d]) => { d.classList.toggle("dim", !linked.has(k)); d.classList.toggle("on", k === id); });
+}
+function reset() { current = null; paths.forEach(p => { p.path.classList.remove("hl", "dim"); p.text.classList.remove("hl", "dim"); p.path.style.stroke = ""; });
+  Object.values(el).forEach(d => d.classList.remove("dim", "on")); }
+box.addEventListener("click", reset);
+function fit() {
+  const s = Math.max(0.6, Math.min(1, (box.clientWidth - 2) / W));
+  stage.style.transform = `scale(${s})`;
+  const z = document.getElementById("sizer"); z.style.width = (W * s) + "px"; z.style.height = (H * s) + "px"; z.style.overflow = "hidden";
+}
+const btn = document.getElementById("theme");
+function setTheme(t) { document.documentElement.dataset.theme = t; btn.textContent = t === "dark" ? "Light mode" : "Dark mode"; draw(); }
+btn.addEventListener("click", () => setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"));
+addEventListener("resize", fit);
+setTheme("light"); fit();
+</script>
+</body>
+</html>
